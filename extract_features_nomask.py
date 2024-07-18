@@ -82,7 +82,7 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Script used to perform dual regression and connectivity map regression for resting state fMRI. Output can be used as input to SwiFUN. Group ICA file is required to be produced by MELODICA and masked via the mask_ICA.py script.')
 parser.add_argument('--groupICA_file', default='dHCP_groupICA_masked.npy', type=str, help='Assume that the group ICA file is registered, masked, and flattened. (dim: # component * # voxels except backgrounds), made in mask_ICA.py')
-parser.add_argument('--outdir', default='out-features', type=str)
+parser.add_argument('--outdir', default='out/features', type=str)
 parser.add_argument('--start_idx', default=0, type=int)
 parser.add_argument('--maskdir', default='mask_preprocessed.nii.gz', type=str,help='Must be produced in mask_ICA.py')
 parser.add_argument('--rs_data_dir', default='img', type=str)
@@ -99,14 +99,29 @@ if not os.path.exists(args.outdir):
         print("Output directory does not exist and user chose not to create it. Exiting...")
         exit()
 
-group_ica = np.load(args.groupICA_file)
+print()
+print('-'*60)
+print('-'*60)
+print(f'Data will always be reshaped from (x,y,z,c) to (c, x*y*z)!')
+print('Make sure that c are the number of independent components...')
+print('-'*60)
+print('-'*60)
+print()
+
+print('Loading group ICA...')
+group_ica = nb.load(args.groupICA_file)
+
+print(f'Reshaping group ICA with dimensions {group_ica.shape}...')
+group_ica_data = group_ica.get_fdata()
+group_ica = np.reshape(group_ica_data, (-1, group_ica_data.shape[-1])).T
+print(f'Successfully reshaped group ICA: {group_ica.shape}')
 
 # set an output directory for the features
 outdir = args.outdir
 
 # set origin directory for raw data
 rs_data_dir = args.rs_data_dir
-mask = nb.load(args.maskdir)
+#mask = nb.load(args.maskdir)
 
 # iterate through all participants and perform feature extraction
 subjects = [ subj for subj in os.listdir(rs_data_dir) ]
@@ -119,13 +134,15 @@ for i, sub in enumerate(sorted(subjects)[args.start_idx:]):
         if not os.path.exists(f'{outdir}/{sub[:15]}_{args.rs_output_file}.npy'): 
             print(f'\tLoading image...')
             rs_image = nb.load(rs_file)
+            rs_data = rs_image.get_fdata()
 
-            print(f'\tApplying mask {mask.shape} to image {rs_image.shape}...')
-            masked_pixels = nilearn.masking.apply_mask(rs_image, mask_img=mask)
-            print(f'\tShape of masked image: {masked_pixels.shape}')
-
-            rs_paths = [masked_pixels]
-
+            print(f'\tReshaping data from (x,y,z,p) to (c,x*y*z)...')
+            # Reshape the data from (x, y, z, t) to (t, x*y*z)
+            reshaped_data = np.reshape(rs_data, (-1, rs_data.shape[-1])).T
+            rs_paths = [reshaped_data]
+            
+            print(f'\tReshaped data successfully from {rs_data.shape} to {reshaped_data.shape}!')
+        
             data = read_multiple_ts_data(rs_paths)
 
             # perform two steps of feature extraction

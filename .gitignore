@@ -6,3 +6,4 @@ corrupted_files.txt
 dHCP_groupICA_masked.npy
 mask.nii.gz
 mask_preprocessed.nii.gz
+out-features

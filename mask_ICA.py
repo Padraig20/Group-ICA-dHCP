@@ -12,7 +12,6 @@ mask_file=mask_file_nifti.get_fdata().astype(int)
 print(f"Shape of mask: {mask_file.shape}")
 
 # preprocess the mask to fit the group ICA map
-
 target_affine = nifti_orig.affine
 target_shape = nifti_orig.shape[:3]
 mask = nilearn.image.resample_img(mask_file_nifti,

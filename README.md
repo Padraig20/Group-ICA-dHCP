@@ -1,4 +1,4 @@
-# Group-ICA-dHCP
+# Grouped Independent Component Analysis (ICA) for the developing Human Connectome Project (dHCP)
 The goal is to perform grouped Independent Component Analysis (ICA) to extract meaningful signals from neonatal brains via the developing Human Connectome Project (dHCP). These Independent Components are planned to be used as an input for SwiFUN, to extract task-related information from resting-state functional Magnetic Resonance Images (rsfMRI).
 
 ## Data
@@ -82,4 +82,5 @@ export PATH=$FSLDIR/bin:$PATH
 Current issues I face include:
 
 * when concatenating fMRI images, we see that we have inconsistent orientations for individual images
+    * the info on orientation is not included in the images -> assumption that the orientation is the same in all images, which makes the assumption of voxel-based orientation correct
 * it is still unclear which exact mask/brain atlas to use for the neonatal data in the dHCP dataset

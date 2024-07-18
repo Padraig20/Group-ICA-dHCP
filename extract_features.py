@@ -78,7 +78,7 @@ def weighted_seed2voxel(seeds, data):
 ##################################################################################
 ##################################################################################
 
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Script used to perform dual regression and connectivity map regression for resting state fMRI. Output can be used as input to SwiFUN. Group ICA file is required to be produced by MELODICA and masked via the mask_ICA.py script.')
 parser.add_argument('--groupICA_file', default='dHCP_groupICA_masked.npy', type=str, help='Assume that the group ICA file is registered, masked, and flattened. (dim: # component * # voxels except backgrounds), made in mask_ICA.py')

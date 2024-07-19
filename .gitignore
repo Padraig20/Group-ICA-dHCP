@@ -1,9 +1,15 @@
 img
+img_reoriented
+
 env
+
 output
+out-features
+
 all_subjects.nii.gz
 corrupted_files.txt
 dHCP_groupICA_masked.npy
+
 mask.nii.gz
+mask1.nii.gz
 mask_preprocessed.nii.gz
-out-features

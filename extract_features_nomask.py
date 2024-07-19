@@ -5,7 +5,6 @@ import nibabel as nb
 import numpy as np
 import os
 import time
-import nilearn.masking
 from scipy.signal import detrend
 from sklearn.preprocessing import StandardScaler
 
@@ -80,11 +79,10 @@ def weighted_seed2voxel(seeds, data):
 
 from argparse import ArgumentParser
 
-parser = ArgumentParser(description='Script used to perform dual regression and connectivity map regression for resting state fMRI. Output can be used as input to SwiFUN. Group ICA file is required to be produced by MELODICA and masked via the mask_ICA.py script.')
-parser.add_argument('--groupICA_file', default='dHCP_groupICA_masked.npy', type=str, help='Assume that the group ICA file is registered, masked, and flattened. (dim: # component * # voxels except backgrounds), made in mask_ICA.py')
+parser = ArgumentParser(description='Script used to perform dual regression and connectivity map regression for resting state fMRI. Output can be used as input to SwiFUN. Group ICA file is required to be produced by MELODICA, will not be masked in the process')
+parser.add_argument('--groupICA_file', default='output/melodic_IC.nii.gz', type=str, help='Assume that the group ICA file is registered and flattened. (dim: # component * # voxels except backgrounds), will not be masked in the process.')
 parser.add_argument('--outdir', default='out/features', type=str)
 parser.add_argument('--start_idx', default=0, type=int)
-parser.add_argument('--maskdir', default='mask_preprocessed.nii.gz', type=str,help='Must be produced in mask_ICA.py')
 parser.add_argument('--rs_data_dir', default='img', type=str)
 parser.add_argument('--rs_output_file', default='features_42_comps', type=str,help='Name suffix of the output file for the resting state features')
 
@@ -121,7 +119,6 @@ outdir = args.outdir
 
 # set origin directory for raw data
 rs_data_dir = args.rs_data_dir
-#mask = nb.load(args.maskdir)
 
 # iterate through all participants and perform feature extraction
 subjects = [ subj for subj in os.listdir(rs_data_dir) ]

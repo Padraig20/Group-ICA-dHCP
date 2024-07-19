@@ -76,11 +76,13 @@ export PATH=$FSLDIR/bin:$PATH
 
 1. concatenate fMRI images along the temporal axis - **concat_fmri.sh**
 2. generate group ICA map - **run_group_ica.sh**
-3. mask group ICA map - **mask_ICA.py**
+3. mask group ICA map - **extract_features.py**
 4. dual regression + connectivity map extraction - **extract_features.py**
 
 Current issues I face include:
 
 * when concatenating fMRI images, we see that we have inconsistent orientations for individual images
     * the info on orientation is not included in the images -> assumption that the orientation is the same in all images, which makes the assumption of voxel-based orientation correct
-* it is still unclear which exact mask/brain atlas to use for the neonatal data in the dHCP dataset
+    * on further consideration, this assumption is incorrect. fsleyes gives an error message -> we need to correct the affine matrix
+* it is still unclear which exact mask to use on the group ICA map, since there are 9 different masks for different gestational ages
+    * OR-concatenate all masks and use the overlap (?)

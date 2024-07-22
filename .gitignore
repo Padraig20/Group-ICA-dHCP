@@ -13,3 +13,13 @@ dHCP_groupICA_masked.npy
 mask.nii.gz
 mask1.nii.gz
 mask_preprocessed.nii.gz
+
+masks/mask_ga36.nii.gz
+masks/mask_ga37.nii.gz
+masks/mask_ga38.nii.gz
+masks/mask_ga39.nii.gz
+masks/mask_ga40.nii.gz
+masks/mask_ga41.nii.gz
+masks/mask_ga42.nii.gz
+masks/mask_ga43.nii.gz
+masks/mask_ga44.nii.gz

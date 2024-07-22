@@ -59,20 +59,29 @@ def download_files(ssh, subject_ids, remote_folder, local_folder):
 def main():
     ssh_alias = "connectome"
     
-    subject_ids_file = "healthy_subjects_ids.txt"
+    subject_ids_folder = "metadata/healthy_subjects"
     remote_folder = "/storage/bigdata/dHCP/fmriprep/1.rs_fmri/4.cleaned_image"
-    local_folder = "./img/"
+    local_folder = "./input/"
 
     if not os.path.exists(local_folder):
         os.makedirs(local_folder)
+        print(f"Created local folder: {local_folder}")
+    
+    for ga in range(34, 45):
 
-    with open(subject_ids_file, 'r') as f:
-        subject_ids = [line.strip() for line in f]
+        with open(os.path.join(subject_ids_folder, f"ga_{ga}.txt"), 'r') as f:
+            subject_ids = [line.strip() for line in f]
+        
+        if not os.path.exists(os.path.join(local_folder, f"ga_{ga}")):
+            os.makedirs(os.path.join(local_folder, f"ga_{ga}"))
+            print(f"Created local folder: {local_folder}")
 
-    ssh = create_ssh_client_from_config(ssh_alias)
-    download_files(ssh, subject_ids, remote_folder, local_folder)
+        ssh = create_ssh_client_from_config(ssh_alias)
+        download_files(ssh, subject_ids, remote_folder, os.path.join(local_folder, f"ga_{ga}"))
 
-    ssh.close()
+        ssh.close()
+        
+        print(f"\nDownloaded files for GA {ga}!\n")
 
 if __name__ == "__main__":
     main()

@@ -155,11 +155,15 @@ for ga in range(36, 45):
     mask_file = load_nifti(os.path.join(args.maskdir, f"mask_ga{ga}.nii.gz"))
     print(f"Shape of mask {ga}: {mask_file.get_fdata().astype(int).shape}")
     masks[ga] = mask_file
+print(Fore.GREEN + 'All 9 Masks loaded successfully!' + Style.RESET_ALL)
 
 print('Loading group ICA...')
-group_ica = load_nifti(args.groupICA_file)
-print(f"Shape of group ICA: {group_ica.shape}")
-group_ica = fit_mask(load_nifti(os.path.join(args.maskdir, "mask_ga41.nii.gz")), group_ica) #TODO replace with actual mask later
+group_ica_file = load_nifti(args.groupICA_file)
+print(f"Shape of group ICA: {group_ica_file.shape}")
+group_icas = dict()
+for ga in range(36, 45):
+    group_icas[ga] = fit_mask(load_nifti(os.path.join(args.maskdir, f"mask_ga{ga}.nii.gz")), group_ica_file)
+print(Fore.GREEN + 'All 9 Group ICA maps loaded and masked successfully!' + Style.RESET_ALL)
 
 # iterate through all participants and perform feature extraction
 subjects = [ subj for subj in os.listdir(rs_data_dir) ]
@@ -174,7 +178,8 @@ for i, sub in enumerate(sorted(subjects)[args.start_idx:]):
             rs_image = load_nifti(rs_file)
             
             gestational_age = int(round(gestational_ages.loc[gestational_ages['id'] == sub[:15], 'ga'].values[0]))
-            print(f"\tUsing mask for gestational age {gestational_age}...")
+            print(f"\tUsing files for gestational age {gestational_age}...")
+            
             masked_pixels = fit_mask(masks[gestational_age], rs_image)
 
             rs_paths = [masked_pixels]
@@ -183,12 +188,14 @@ for i, sub in enumerate(sorted(subjects)[args.start_idx:]):
 
             # perform two steps of feature extraction
             print('\tExtracting features...')
+            group_ica = group_icas[gestational_age]
             dr_comps = dual_regression(data, group_ica)
             features = weighted_seed2voxel(dr_comps, data)
 
             print('\tSaving features...')
             to_save = features.T
             np.save(f'{outdir}/{sub[:15]}_{args.rs_output_file}', to_save)
+            print(Fore.GREEN + f'\tSuccess! Features saved to {outdir}/{sub[:15]}_{args.rs_output_file}.npy' + Style.RESET_ALL)
         else:
             print('\tFile already exists!')
     except Exception as e:
@@ -196,5 +203,6 @@ for i, sub in enumerate(sorted(subjects)[args.start_idx:]):
         print(Fore.RED + f'\tFollowing error occured: {e}' + Style.RESET_ALL)
         with open('corrupted_files.txt','a') as f:
             f.write(f'{sub}\n')
-    end=time.time()
-    print(f'\tTime taken to process {sub[:15]}: {end-start}')
+    finally:
+        end=time.time()
+        print(f'\tTime taken to process {sub[:15]}: {end-start}')

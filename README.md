@@ -86,3 +86,11 @@ Current issues I face include:
     * on further consideration, this assumption is incorrect. fsleyes gives an error message -> we need to correct the affine matrix
 * it is still unclear which exact mask to use on the group ICA map, since there are 9 different masks for different gestational ages
     * OR-concatenate all masks and use the overlap (?)
+
+ Solution to all problems:
+
+ * All images are registered to a different template, according to the gestational age of the subject
+    * This means that concatenating images from subjects with different gestational ages will result in error
+    * Furthermroe, this means that we have to generate 9 different ICA maps for each gestational age
+        * Possibly take ~30 healthy subjects from each gestational age
+    * **This means that we can simply mask the group ICA maps with the mask adhering to the gestational age of the analyzed subjects!**

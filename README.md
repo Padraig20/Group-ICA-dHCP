@@ -3,11 +3,17 @@ The goal is to perform grouped Independent Component Analysis (ICA) to extract m
 
 ## Data
 
-A total of 100 healthy subjects have been chosen. In this sense, we choose normally developing children, i.e. the ones with low risk of developmental delay according to their BSID-III and Q-CHAT scores. There are 725 subjects who have undertaken both Q-CHAT and BSID-III tests. In order to be seen with low risk of developmental delay, children need a BSID-III score higher than 85 regarding the cognitive, language and motor composite scores and a Q-CHAT score lower than or equal to 32.
+There exist 9 different gestational ages in total, from 36 to 44 weeks. Each gestational age needs to be handled separately, and we chose a maximum of 20 random samples of each gestational age. In this sense, we choose normally developing children, i.e. the ones with low risk of developmental delay according to their BSID-III and Q-CHAT scores. There are 725 subjects who have undertaken both Q-CHAT and BSID-III tests. In order to be seen with low risk of developmental delay, children need a BSID-III score higher than 85 regarding the cognitive, language and motor composite scores and a Q-CHAT score lower than or equal to 32.
 
-408 from 725 children pass all tests. This means that 317 do not pass the test and are at risk of developmental delay/autism.
+We only use normally developing children's data since it might be more stable and less noisy (maybe less variability and fewer artifacts) and result in a more reliable set of features. Furthermore, such ICA process might help detecting deviations from the normally developing group.
 
-From these subjects, we have chosen 100 random children to use for group ICA. The ids of these subjects may be found in the file **healthy_subjects_ids.txt**. Some of these subjects have undergone multiple fMRI sessions - we have chosen to only use one fMRI session per subject for analysis.
+408 from 725 children pass all tests. This means that 317 do not pass the test and are at risk of developmental delay/autism. 334 from these 408 children have fMRI data available. 273 children remain after removing all subjects with duplicates and gestational ages outside the defined range.
+
+![image](https://github.com/user-attachments/assets/58e30e97-2f07-4a7a-b6a8-dd3711e11947)
+
+As we can see, there are unfortunately only 4 and 6 subjects available for gestational ages 36 and 37, respectively. In this case, we will use all data available to use for ICA.
+
+The ids of these subjects may be found in **metadata/healthy_subjects/**. Some of these subjects have undergone multiple fMRI sessions - we have chosen to only use one fMRI session per subject for analysis.
 
 For people with access to the ConnectomeLAB internal server, these files may be downloaded via the **download_healthy_subjects.py** script. Please make sure that everything is set up correctly in the ssh config file.
 
@@ -77,20 +83,33 @@ export PATH=$FSLDIR/bin:$PATH
 1. concatenate fMRI images along the temporal axis - **concat_fmri.sh**
 2. generate group ICA map - **run_group_ica.sh**
 3. mask group ICA map - **extract_features.py**
-4. dual regression + connectivity map extraction - **extract_features.py**
+4. dual regression + connectivity map extraction for each subject - **extract_features.py**
 
-Current issues I face include:
+This workflow is required for each gestational age.
 
-* when concatenating fMRI images, we see that we have inconsistent orientations for individual images
-    * the info on orientation is not included in the images -> assumption that the orientation is the same in all images, which makes the assumption of voxel-based orientation correct
-    * on further consideration, this assumption is incorrect. fsleyes gives an error message -> we need to correct the affine matrix
-* it is still unclear which exact mask to use on the group ICA map, since there are 9 different masks for different gestational ages
-    * OR-concatenate all masks and use the overlap (?)
+```
+FOR each gestational_age IN range(36, 45):
+   CONCATENATE fMRI images FROM input_directory FOR current gestational_age INTO output_file
+   GENERATE group ICA map FROM concatenated fMRI file FOR current gestational_age INTO output_directory
+   APPLY brain_mask FOR current gestational_age TO group ICA map FOR current gestational_age INTO masked_output_file
+   FOR each subject fMRI data IN subjects FOR current gestational_age:
+      APPLY brain_mask FOR current gestational_age TO current subject
+      PERFORM dual regression ON group ICA map FOR current gestational_age USING masked subject fMRI data
+      EXTRACT connectivity map FROM masked subject fMRI data FOR current gestational_age INTO feature_output_directory
+```
 
- Solution to all problems:
+### Justification for Multiple Group ICA Maps and Masks
 
- * All images are registered to a different template, according to the gestational age of the subject
-    * This means that concatenating images from subjects with different gestational ages will result in error
-    * Furthermroe, this means that we have to generate 9 different ICA maps for each gestational age
-        * Possibly take ~30 healthy subjects from each gestational age
-    * **This means that we can simply mask the group ICA maps with the mask adhering to the gestational age of the analyzed subjects!**
+The greatest challenge for working with neonatal data is the great variability in brain size and structure happening in just a few
+weeks. This is why [the official website](https://gin.g-node.org/BioMedIA/dhcp-volumetric-atlas-groupwise/src/master/mean) offers
+a total of 9 masks for different gestational ages, i.e. between 36 and 44 weeks. Each brain is registered to a template according
+to the gestational age. This becomes evident when looking into the affine matrices of the data.
+
+![image](https://github.com/user-attachments/assets/baae8d81-8ce5-480f-8054-e5c2d196335e)
+
+As seen in the picture, images with the same gestational age have the same affine matrices, while the data with different
+gestational ages have different affine matrices. 
+
+This alone would result in different (and incompatible) dimensionalities for dual regression and connectivity map extraction.
+To address this issue, we need to generate and mask the group ICA maps with the data adhering to the gestational age of
+the analyzed subjects. As a consequence, we will also work with **9 different ICA maps for each gestational age**.

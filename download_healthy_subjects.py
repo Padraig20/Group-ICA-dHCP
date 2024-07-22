@@ -67,7 +67,7 @@ def main():
         os.makedirs(local_folder)
         print(f"Created local folder: {local_folder}")
     
-    for ga in range(34, 45):
+    for ga in range(36, 45):
 
         with open(os.path.join(subject_ids_folder, f"ga_{ga}.txt"), 'r') as f:
             subject_ids = [line.strip() for line in f]

@@ -122,7 +122,7 @@ parser = ArgumentParser(description='Script used to perform dual regression and 
 parser.add_argument('--groupICA_dir', default='input_registered', type=str, help='Assume that the group ICA files are registered and flattened (dim: # component * # voxels except backgrounds), will be masked on the fly. Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
 parser.add_argument('--outdir', default='out-features', type=str)
 parser.add_argument('--start_idx', default=0, type=int)
-parser.add_argument('--maskdir', default='masks', type=str,help='Use the masks you can download from the dHCP website; use the script. It will be preprocessed on the flight for each separate image.')
+parser.add_argument('--maskdir', default='metadata/masks', type=str,help='Use the masks you can download from the dHCP website; use the script. It will be preprocessed on the flight for each separate image.')
 parser.add_argument('--metadata', default='metadata/ga.tsv', type=str,help='Load the tsv-file containing the subjects\' gestational ages.')
 parser.add_argument('--rs_data_dir', default='rs_data', type=str, help='Directory containing the resting state data from which the features should be extracted.')
 parser.add_argument('--rs_output_file', default='features_42_comps', type=str,help='Name suffix of the output file for the resting state features')

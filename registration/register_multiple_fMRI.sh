@@ -57,7 +57,7 @@ for dir in "../$INPUT_DIR"/*; do
 
                 file_name=$(basename "$file")
 
-                ../register_single_fMRI.sh "$file" "../registered_$INPUT_DIR/$dir_name/$file_name" "../$TEMPLATE_DIR/template_t1_$dir_name.nii.gz" "$NUM_THREADS" "$TARGET_DIM"
+                ../registration/register_single_fMRI.sh "$file" "../registered_$INPUT_DIR/$dir_name/$file_name" "../$TEMPLATE_DIR/template_t1_$dir_name.nii.gz" "$NUM_THREADS" "$TARGET_DIM"
 
                 if [ $? -ne 0 ]; then
                     echo "Error: Failed to register $file"

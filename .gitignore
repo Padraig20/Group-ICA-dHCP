@@ -26,3 +26,13 @@ masks/mask_ga41.nii.gz
 masks/mask_ga42.nii.gz
 masks/mask_ga43.nii.gz
 masks/mask_ga44.nii.gz
+
+t1-templates/template_t1_ga36.nii.gz
+t1-templates/template_t1_ga37.nii.gz
+t1-templates/template_t1_ga38.nii.gz
+t1-templates/template_t1_ga39.nii.gz
+t1-templates/template_t1_ga40.nii.gz
+t1-templates/template_t1_ga41.nii.gz
+t1-templates/template_t1_ga42.nii.gz
+t1-templates/template_t1_ga43.nii.gz
+t1-templates/template_t1_ga44.nii.gz

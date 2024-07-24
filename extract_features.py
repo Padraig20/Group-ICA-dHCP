@@ -119,7 +119,7 @@ def fit_mask(mask_file_nifti, img):
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Script used to perform dual regression and connectivity map regression for resting state fMRI. Output can be used as input to SwiFUN. Group ICA file is required to be produced by MELODICA, will be masked on the fly.')
-parser.add_argument('--groupICA_dir', default='input', type=str, help='Assume that the group ICA files are registered and flattened (dim: # component * # voxels except backgrounds), will be masked on the fly. Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
+parser.add_argument('--groupICA_dir', default='input_registered', type=str, help='Assume that the group ICA files are registered and flattened (dim: # component * # voxels except backgrounds), will be masked on the fly. Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
 parser.add_argument('--outdir', default='out-features', type=str)
 parser.add_argument('--start_idx', default=0, type=int)
 parser.add_argument('--maskdir', default='masks', type=str,help='Use the masks you can download from the dHCP website; use the script. It will be preprocessed on the flight for each separate image.')
@@ -152,7 +152,7 @@ gestational_ages = pd.DataFrame(md, columns=['id', 'sex', 'ga'])
 print('Loading masks...')
 masks = dict()
 for ga in range(36, 45):
-    mask_file = load_nifti(os.path.join(args.maskdir, f"mask_ga{ga}.nii.gz"))
+    mask_file = load_nifti(os.path.join(args.maskdir, f"mask_ga_{ga}.nii.gz"))
     print(f"Shape of mask {ga}: {mask_file.get_fdata().astype(int).shape}")
     masks[ga] = mask_file
 print(Fore.GREEN + 'All 9 Masks loaded successfully!' + Style.RESET_ALL)

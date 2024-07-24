@@ -13,12 +13,12 @@ for ga in {36..44}; do
   if [[ "$user_input" == "y" ]]; then
     file_url="${base_url}/ga_${ga}/template_t1.nii.gz"
     
-    wget -O "template_t1_ga${ga}.nii.gz" "$file_url"
+    wget -O "template_t1_ga_${ga}.nii.gz" "$file_url"
     
     if [[ $? -eq 0 ]]; then
-      echo "Downloaded and renamed template_t1_ga${ga}.nii.gz successfully."
+      echo "Downloaded and renamed template_t1_ga_${ga}.nii.gz successfully."
     else
-      echo "Failed to download template_t1_ga${ga}.nii.gz."
+      echo "Failed to download template_t1_ga_${ga}.nii.gz."
     fi
   else
     echo "Skipped download for ga_${ga}."

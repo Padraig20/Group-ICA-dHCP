@@ -70,13 +70,25 @@ Papers focusing on binary classification:
 
 The setup works successfully for **Python 3.9.19**. **It did not work for newer Python versions!!!**
 
-For this workflow, we use tools from **FSL 6.0.7.12**, namely *fslmerge* and *MELODIC*. You can download FSL [here](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation). On Linux, make sure to add following files in your *bashrc* to set the necessary environment.
+For this workflow, we use tools from **FSL 6.0.7.12**, namely *fslmerge*, *fslroi*, *fslval* and *MELODIC*. You can download FSL [here](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation). On Linux, make sure to add following files in your *bashrc* to set the necessary environment.
 
 ```
 export FSLDIR="/home/<user>/fsl"
 source $FSLDIR/etc/fslconf/fsl.sh
 export PATH=$FSLDIR/bin:$PATH
 ```
+
+Please make sure to register all images to the according T1-weighted image. If not yet registered, you can use the script *register_fMRI.sh* for this purpose.
+
+The masks and T1 templates can be downloaded via the *download_templates.sh* and *download_masks.sh* scripts in the respective directories.
+
+For image registration, we use tools from **ANTs 2.5.2**, namely *antsApplyTransforms*, *antsRegistrationSyNQuick.sh* and *ResampleImage*. To speed up
+the registration process, we require **GNU parallel 20230822**.
+
+## fMRI Image Registration
+
+The fMRI images are required to be registered to their respective T1 images, i.e. to the T1-weighted template according to the gestational
+age.
 
 ## Workflow
 

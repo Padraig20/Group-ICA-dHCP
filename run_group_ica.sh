@@ -33,7 +33,7 @@ for dir in */; do
 
         # Check if the MELODIC command was successful
         if [ $? -eq 0 ]; then
-            echo "Successfully ran group ICA.
+            echo "Successfully ran group ICA."
         else
             echo "Error: MELODIC command failed."
             exit 1

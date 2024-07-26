@@ -147,7 +147,7 @@ rs_data_dir = args.rs_data_dir
 # load metadata
 print(Style.RESET_ALL + f"Loading metadata from {args.metadata}...")
 md = pd.read_csv(args.metadata, delimiter='\t')
-gestational_ages = pd.DataFrame(md, columns=['id', 'sex', 'ga'])
+gestational_ages = pd.DataFrame(md, columns=['ses', 'id', 'ga']) # ses	id	ga
 
 print('Loading masks...')
 masks = dict()
@@ -185,7 +185,12 @@ for i, sub in enumerate(sorted(subjects)[args.start_idx:]):
             print(f'\tLoading image...')
             rs_image = load_nifti(rs_file)
             
-            gestational_age = int(gestational_ages.loc[gestational_ages['id'] == sub[:15], 'ga'].values[0])
+            # extract subject ID and session ID from the file name
+            file_name = os.path.basename(rs_file)
+            subject_id = file_name.split('_')[0]
+            session_id = int(file_name.split('_')[1].split('-')[1])
+            
+            gestational_age = int(gestational_ages.loc[(gestational_ages['id'] == subject_id) & (gestational_ages['ses'] == session_id), 'ga'].values[0])
             print(f"\tUsing files for gestational age {gestational_age}...")
             
             masked_pixels = fit_mask(masks[gestational_age], rs_image)

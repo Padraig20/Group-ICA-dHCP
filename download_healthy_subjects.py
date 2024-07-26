@@ -36,9 +36,9 @@ def download_files(ssh, subject_ids, remote_folder, local_folder):
     local_files = list_local_files(local_folder)
     
     with SCPClient(ssh.get_transport()) as scp:
-        for subject_id in tqdm(subject_ids):
+        for subject_id, ses_id in tqdm(subject_ids):
 
-            pattern = f"{subject_id}_*.nii.gz"
+            pattern = f"{subject_id}_ses-{ses_id}_*.nii.gz"
 
             if any(fnmatch.fnmatch(file, pattern) for file in local_files):
                 print(f"Files for {subject_id} already exist in the local directory. Skipping download.")
@@ -70,7 +70,7 @@ def main():
     for ga in range(36, 45):
 
         with open(os.path.join(subject_ids_folder, f"ga_{ga}.txt"), 'r') as f:
-            subject_ids = [line.strip() for line in f]
+            subject_ids = [tuple(line.strip().split('\t')) for line in f.readlines()[1:]]
         
         if not os.path.exists(os.path.join(local_folder, f"ga_{ga}")):
             os.makedirs(os.path.join(local_folder, f"ga_{ga}"))

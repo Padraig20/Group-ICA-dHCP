@@ -84,7 +84,7 @@ process_volume() {
 	rm "registered_timepoints/timepoint_${i}.nii.gz" 
 	rm "registered_timepoints/timepoint_${i}_registered.nii.gz" 
 
-    echo "$i finished..."
+    echo "Timepoint $i finished..."
 }
 
 export -f process_volume

@@ -1,6 +1,32 @@
 # Grouped Independent Component Analysis (ICA) for the developing Human Connectome Project (dHCP)
 The goal is to perform grouped Independent Component Analysis (ICA) to extract meaningful signals from neonatal brains via the developing Human Connectome Project (dHCP). These Independent Components are planned to be used as an input for SwiFUN, to extract task-related information from resting-state functional Magnetic Resonance Images (rsfMRI).
 
+## Project Structure
+
+```
+Group-ICA-dHCP
+├── deprecated                       <- old scripts that are no longer used in the workflow
+│   ├── extract_features_nomask.py   <- extracts features without masking
+│   ├── healthy_subjects_ids.txt     <- 100 healthy subjects, not grouped into gestational ages
+│   └── mask_ICA.py                  <- masks group ICA map via only one mask; masking is now done on the fly
+├── ica-workflow                     <- contains the whole workflow for generating ICA features
+│   ├── concat_fmri.sh               <- step 1: concatenates normalized fMRI volumes along the temporal axis
+│   ├── extract_features.py          <- step 3: extracts features via the generated group ICA maps, masks on the fly
+│   └── run_group_ica.sh             <- step 2: performs ICA on the concatenated fMRI volumes, outputs group ICA map
+├── metadata                         <- contains important metadata
+│   ├── ga.tsv                       <- is used to map files to their respective gestational ages
+│   ├── healthy_subjects/            <- contains txt files with ids of healthy subjects used for ICA, grouped in gestational ages
+│   ├── masks/                       <- will contain the downloaded masks
+│   └── t1-templates/                <- will contain the downloaded t1-weighted templates
+├── registration                     <- contains all code necessary to register fMRI images to templates
+│   ├── register_multiple_fMRI.sh    <- registers all images in a directory according to the gestational ages; beware required directory structure
+│   └── register_single_fMRI.sh      <- registers one image to a specified template
+└── setup                            <- all code required to set up the project
+    ├── download_healthy_subjects.py <- download the healthy subjects in the required directory structure from ConnectomeLAB's internal server
+    ├── download_masks.sh            <- downloads all required masks and puts them into ./metadata/masks/
+    └── download_templates.sh        <- downloads all required templates and puts them into ./metadata/t1-templates/
+```
+
 ## Data
 
 There exist 9 different gestational ages in total, from 36 to 44 weeks. Each gestational age needs to be handled separately, and we chose a maximum of 20 random samples of each gestational age. In this sense, we choose normally developing children, i.e. the ones with low risk of developmental delay according to their BSID-III and Q-CHAT scores. There are 725 subjects who have undertaken both Q-CHAT and BSID-III tests. In order to be seen with low risk of developmental delay, children need a BSID-III score higher than 85 regarding the cognitive, language and motor composite scores and a Q-CHAT score lower than or equal to 32.

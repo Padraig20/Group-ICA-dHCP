@@ -11,7 +11,7 @@ We only use normally developing children's data since it might be more stable an
 
 ![image](https://github.com/user-attachments/assets/7d69bb6f-e967-42b5-bf60-9dcd68d2afeb)
 
-As we can see, there are unfortunately only 4 and 6 subjects available for gestational ages 36 and 37, respectively. In this case, we will use all data available to use for ICA.
+As we can see, there are unfortunately only 7 and 8 subjects available for gestational ages 36 and 37, respectively. In this case, we will use all data available to use for ICA.
 
 The ids of these subjects may be found in **metadata/healthy_subjects/**. Some of these subjects have undergone multiple fMRI sessions - we have chosen to only use one fMRI session per subject for analysis.
 

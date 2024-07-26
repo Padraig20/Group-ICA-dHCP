@@ -7,9 +7,9 @@ There exist 9 different gestational ages in total, from 36 to 44 weeks. Each ges
 
 We only use normally developing children's data since it might be more stable and less noisy (maybe less variability and fewer artifacts) and result in a more reliable set of features. Furthermore, such ICA process might help detecting deviations from the normally developing group.
 
-408 from 725 children pass all tests. This means that 317 do not pass the test and are at risk of developmental delay/autism. 334 from these 408 children have fMRI data available. 273 children remain after removing all subjects with duplicates and gestational ages outside the defined range.
+408 from 725 children pass all tests. This means that 317 do not pass the test and are at risk of developmental delay/autism. 334 from these 408 children have fMRI data available. 321 children remain after removing all subjects with gestational ages outside the defined range.
 
-![image](https://github.com/user-attachments/assets/58e30e97-2f07-4a7a-b6a8-dd3711e11947)
+![image](https://github.com/user-attachments/assets/7d69bb6f-e967-42b5-bf60-9dcd68d2afeb)
 
 As we can see, there are unfortunately only 4 and 6 subjects available for gestational ages 36 and 37, respectively. In this case, we will use all data available to use for ICA.
 

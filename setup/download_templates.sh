@@ -3,7 +3,20 @@
 base_url="https://gin.g-node.org/BioMedIA/dhcp-volumetric-atlas-groupwise/raw/master/mean"
 
 echo "This script will download the t1 template files for gestational ages 36 to 44..."
-echo "Make sure you are in the folder where you want to download the files!"
+echo "Make sure you are in the main directory of the project!"
+
+echo "Do you want to create a folder 'metadata/t1-templates'? (y/n)"
+read create_folder
+
+if [[ "$create_folder" == "y" ]]; then
+  mkdir -p metadata/t1-templates
+  echo "Folder 'metadata/t1-templates' created successfully."
+else
+  echo "Skipped creating folder 'metadata/t1-templates', exiting..."
+  exit 1
+fi
+
+cd metadata/t1-templates || exit 1
 
 # gestational ages range from 36 to 44
 for ga in {36..44}; do

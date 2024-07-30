@@ -105,13 +105,7 @@ def load_nifti(path):
 def fit_mask(mask_file_nifti, img):
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        target_affine = img.affine
-        target_shape = img.shape[:3]
-        mask = nilearn.image.resample_img(mask_file_nifti,
-                                        target_affine=target_affine, 
-                                        target_shape=target_shape, interpolation='nearest')
-        print(f'\tApplying transformed mask {mask.shape} to image {img.shape}...')
-        masked_pixels = nilearn.masking.apply_mask(img, mask_img=mask)
+        masked_pixels = nilearn.masking.apply_mask(img, mask_img=mask_file_nifti)
         print(f'\tShape of masked image: {masked_pixels.shape}')
         captured_warnings.extend(w)
         return masked_pixels
@@ -119,13 +113,13 @@ def fit_mask(mask_file_nifti, img):
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Script used to perform dual regression and connectivity map regression for resting state fMRI. Output can be used as input to SwiFUN. Group ICA file is required to be produced by MELODICA, will be masked on the fly.')
-parser.add_argument('--groupICA_dir', default='input_registered', type=str, help='Assume that the group ICA files are registered and flattened (dim: # component * # voxels except backgrounds), will be masked on the fly. Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
+parser.add_argument('--groupICA_dir', default='registered_input-test', type=str, help='Assume that the group ICA files are registered and flattened (dim: # component * # voxels except backgrounds), will be masked on the fly. Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
 parser.add_argument('--outdir', default='out-features', type=str)
 parser.add_argument('--start_idx', default=0, type=int)
-parser.add_argument('--maskdir', default='metadata/masks', type=str,help='Use the masks you can download from the dHCP website; use the script. It will be preprocessed on the flight for each separate image.')
+parser.add_argument('--maskdir', default='metadata/ica_masks', type=str,help='Use the masks created by create_masks.py.')
 parser.add_argument('--metadata', default='metadata/ga.tsv', type=str,help='Load the tsv-file containing the subjects\' gestational ages.')
 parser.add_argument('--rs_data_dir', default='rs_data', type=str, help='Directory containing the resting state data from which the features should be extracted.')
-parser.add_argument('--rs_output_file', default='features_42_comps', type=str,help='Name suffix of the output file for the resting state features')
+parser.add_argument('--rs_output_file', default='features_7_comps', type=str,help='Name suffix of the output file for the resting state features')
 
 args = parser.parse_args()
 
@@ -152,18 +146,26 @@ gestational_ages = pd.DataFrame(md, columns=['ses', 'id', 'ga']) # ses	id	ga
 print('Loading masks...')
 masks = dict()
 for ga in range(36, 45):
-    mask_file = load_nifti(os.path.join(args.maskdir, f"mask_ga_{ga}.nii.gz"))
-    print(f"Shape of mask {ga}: {mask_file.get_fdata().astype(int).shape}")
-    masks[ga] = mask_file
-print(Fore.GREEN + 'All 9 Masks loaded successfully!' + Style.RESET_ALL)
+    try:
+        mask_file = load_nifti(os.path.join(args.maskdir, f"mask_ga_{ga}.nii.gz"))
+        print(f"Shape of mask {ga}: {mask_file.get_fdata().astype(int).shape}")
+        masks[ga] = mask_file
+    except Exception as e:
+        print(Fore.YELLOW + f'Could not load mask for age {ga}: {e}' + Style.RESET_ALL)
+
+if len(masks) == 0:
+    print(Fore.RED + "No masks were successfully loaded. Exiting..." + Style.RESET_ALL)
+    exit()
+else:   
+    print(Fore.GREEN + 'Successfully loaded masks for the following gestational ages:', masks.keys(), Style.RESET_ALL)
 
 print('Loading group ICA...')
 group_icas = dict()
 for ga in range(36, 45):
     try:
-        group_ica_file = load_nifti(os.path.join(args.groupICA_dir, f"ga_{ga}" , "output", "melodic_IC.nii.gz"))
+        group_ica_file = np.load(os.path.join(args.groupICA_dir, f"ga_{ga}" , "output", "melodic_IC_masked.npy"))
         print(f"Shape of group ICA for gestational age {ga}: {group_ica_file.shape}")
-        group_icas[ga] = fit_mask(masks[ga], group_ica_file)
+        group_icas[ga] = group_ica_file
     except Exception as e:
         print(Fore.YELLOW + f'Could not load group ICA map for age {ga}: {e}' + Style.RESET_ALL)
         
@@ -207,8 +209,8 @@ for i, sub in enumerate(sorted(subjects)[args.start_idx:]):
 
             print('\tSaving features...')
             to_save = features.T
-            np.save(f'{outdir}/{sub[:15]}_{args.rs_output_file}', to_save)
-            print(Fore.GREEN + f'\tSuccess! Features saved to {outdir}/{sub[:15]}_{args.rs_output_file}.npy' + Style.RESET_ALL)
+            np.save(f'{outdir}/{subject_id}_ses-{session_id}_{args.rs_output_file}', to_save)
+            print(Fore.GREEN + f'\tSuccess! Features saved to {outdir}/{subject_id}_ses-{session_id}_{args.rs_output_file}.npy' + Style.RESET_ALL)
         else:
             print('\tFile already exists!')
     except Exception as e:

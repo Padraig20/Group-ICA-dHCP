@@ -122,7 +122,7 @@ age.
 
 1. concatenate fMRI images along the temporal axis - **concat_fmri.sh**
 2. generate group ICA map - **run_group_ica.sh**
-3. mask group ICA map - **extract_features.py**
+3. mask group ICA map and generate masks - **create_masks.py**
 4. dual regression + connectivity map extraction for each subject - **extract_features.py**
 
 This workflow is required for each gestational age.

@@ -11,7 +11,8 @@ Group-ICA-dHCP
 │   └── mask_ICA.py                  <- masks group ICA map via only one mask; masking is now done on the fly
 ├── ica-workflow                     <- contains the whole workflow for generating ICA features
 │   ├── concat_fmri.sh               <- step 1: concatenates normalized fMRI volumes along the temporal axis
-│   ├── extract_features.py          <- step 3: extracts features via the generated group ICA maps, masks on the fly
+│   ├── create_masks.py              <- step 3: masks the group ICA maps and saves the masks which will be used during SwiFT training and feature extraction
+│   ├── extract_features.py          <- step 4: extracts features via the masked group ICA maps and saved masks from step 3
 │   └── run_group_ica.sh             <- step 2: performs ICA on the concatenated fMRI volumes, outputs group ICA map
 ├── metadata                         <- contains important metadata
 │   ├── ga.tsv                       <- is used to map files to their respective gestational ages
@@ -19,6 +20,7 @@ Group-ICA-dHCP
 │   ├── masks/                       <- will contain the downloaded masks
 │   └── t1-templates/                <- will contain the downloaded t1-weighted templates
 ├── registration                     <- contains all code necessary to register fMRI images to templates
+│   ├── register_failed_fMRI.sh      <- tries registering all images that did not pass registration in "register_multiple_fMRI.sh"
 │   ├── register_multiple_fMRI.sh    <- registers all images in a directory according to the gestational ages; beware required directory structure
 │   └── register_single_fMRI.sh      <- registers one image to a specified template
 └── setup                            <- all code required to set up the project

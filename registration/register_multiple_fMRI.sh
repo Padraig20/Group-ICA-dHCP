@@ -15,8 +15,6 @@
 #     └── ...
 # The output directory will have the same structure as the input directory, but with the registered fMRI images.
 
-set -e
-
 if [ "$#" -ne 4 ]; then
     echo "Usage: $0 <input_dir> <template_dir> <num_threads> <target_dim>"
     echo "Example: $0 input t1-templates 4 68x67x45"
@@ -39,8 +37,16 @@ if [ ! -d "$TEMPLATE_DIR" ]; then
 fi
 
 mkdir -v registered_"$INPUT_DIR"
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to create output directory: registered_$file"
+    exit 1
+fi
 
 mkdir -v .temp-registration-processing
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to create temporary working directory: .temp-registration-processing"
+    exit 1
+fi
 cd .temp-registration-processing || exit 1
 
 for dir in "../$INPUT_DIR"/*; do

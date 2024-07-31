@@ -67,7 +67,9 @@ for dir in "../$INPUT_DIR"/*; do
 
                 if [ $? -ne 0 ]; then
                     echo "Error: Failed to register $file"
-                    echo "$file" >> failed_registration.txt
+                    echo "$file" >> ../failed_registration.txt
+                    echo "Deleting contents of temporary working directory..."
+                    rm -rdf *
                     continue
                 fi
 

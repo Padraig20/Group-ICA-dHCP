@@ -60,7 +60,9 @@ while IFS= read -r file; do
 
     if [ $? -ne 0 ]; then
         echo "Error: Failed to register $file"
-        echo "$file" >> failed_registration_retried.txt
+        echo "$file" >> ../failed_registration_retried.txt
+        echo "Deleting contents of temporary working directory..."
+        rm -rdf *
         continue
     fi
 

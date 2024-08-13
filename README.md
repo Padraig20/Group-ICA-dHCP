@@ -31,15 +31,15 @@ Group-ICA-dHCP
 
 ## Data
 
-There exist 9 different gestational ages in total, from 36 to 44 weeks. Each gestational age needs to be handled separately, and we chose a maximum of 20 random samples of each gestational age. In this sense, we choose normally developing children, i.e. the ones with low risk of developmental delay according to their BSID-III and Q-CHAT scores. There are 725 subjects who have undertaken both Q-CHAT and BSID-III tests. In order to be seen with low risk of developmental delay, children need a BSID-III score higher than 85 regarding the cognitive, language and motor composite scores and a Q-CHAT score lower than or equal to 32.
+There exist 9 different gestational ages in total, from 36 to 44 weeks. Each gestational age needs to be handled separately, and we chose a maximum of 20 random samples of each gestational age. In this sense, we choose normally developing children, i.e. the ones with low risk of developmental delay according to their BSID-III and Q-CHAT scores. There are 725 subjects who have undertaken both Q-CHAT and BSID-III tests. In order to be seen with low risk of developmental delay, children need a BSID-III score higher than 85 regarding the cognitive, language and motor composite scores and a Q-CHAT score between or equal to 19 and 35.
 
 We only use normally developing children's data since it might be more stable and less noisy (maybe less variability and fewer artifacts) and result in a more reliable set of features. Furthermore, such ICA process might help detecting deviations from the normally developing group.
 
-408 from 725 children pass all tests. This means that 317 do not pass the test and are at risk of developmental delay/autism. 334 from these 408 children have fMRI data available. 321 children remain after removing all subjects with gestational ages outside the defined range.
+431 from 725 children pass all tests. This means that 294 do not pass the test and are at risk of developmental delay/autism. 358 from these 431 children have fMRI data available. 348 children remain after removing all subjects with gestational ages outside the defined range.
 
 ![image](https://github.com/user-attachments/assets/7d69bb6f-e967-42b5-bf60-9dcd68d2afeb)
 
-As we can see, there are unfortunately only 7 and 8 subjects available for gestational ages 36 and 37, respectively. In this case, we will use all data available to use for ICA.
+As we can see, there are unfortunately only 8 and 9 subjects available for gestational ages 36 and 37, respectively. In this case, we will use all data available to use for ICA.
 
 The ids of these subjects may be found in **metadata/healthy_subjects/**. Some of these subjects have undergone multiple fMRI sessions - we have chosen to only use one fMRI session per subject for analysis.
 
@@ -47,23 +47,10 @@ For people with access to the ConnectomeLAB internal server, these files may be 
 
 ### Justification for Q-CHAT Threshold
 
-Although [one study](https://pubmed.ncbi.nlm.nih.gov/18240013/) suggests that
+[One study](https://pubmed.ncbi.nlm.nih.gov/18240013/) suggests that
 typically developing children receive a score between 19 and 35 while
-children who later develop ASD receive a score between 38 and 66, all major
-literature derives a binary classification problem from this, such that:
-
-* **lower or equal to 32:** low risk of being intellectually challenged
-* **higher than 32:** high risk of being intellectually challenged
-
-This is confirmed by the study [The Autism-Spectrum Quotient (AQ): Evidence from Asperger Syndrome/High-Functioning Autism, Males and Females, Scientists and Mathematicians](https://link.springer.com/article/10.1023/A:1005653411471).
-
-Other literature citing above article to support their decision of following
-a binary classification problem:
-
-* [A machine learning autism classification based on logistic regression analysis](https://link.springer.com/article/10.1007/s13755-019-0073-5)
-* [The Autism Spectrum Quotient: Children’s Version (AQ-Child)](https://link.springer.com/article/10.1007/s10803-007-0504-z)
-* [Using Machine Learning Methods to Predict Autism Syndrome](http://paper.ijcsns.org/07_book/202004/20200427.pdf)
-* [A Deep Neural Network-Based Model for Screening Autism Spectrum Disorder Using the Quantitative Checklist for Autism in Toddlers (QCHAT)](https://link.springer.com/article/10.1007/s10803-021-05141-2)
+children who later develop ASD receive a score between 38 and 66. This
+is what we will use in our assumptions
 
 ### Justification for BSID-III Threshold
 

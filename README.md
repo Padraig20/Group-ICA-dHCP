@@ -37,7 +37,7 @@ We only use normally developing children's data since it might be more stable an
 
 431 from 725 children pass all tests. This means that 294 do not pass the test and are at risk of developmental delay/autism. 358 from these 431 children have fMRI data available. 348 children remain after removing all subjects with gestational ages outside the defined range.
 
-![image](https://github.com/user-attachments/assets/7d69bb6f-e967-42b5-bf60-9dcd68d2afeb)
+![image](https://github.com/user-attachments/assets/2a69b6fc-5ab5-4a47-8653-b9a30c310ead)
 
 As we can see, there are unfortunately only 8 and 9 subjects available for gestational ages 36 and 37, respectively. In this case, we will use all data available to use for ICA.
 

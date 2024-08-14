@@ -125,6 +125,8 @@ FOR each gestational_age IN range(36, 45):
       EXTRACT connectivity map FROM masked subject fMRI data FOR current gestational_age INTO feature_output_directory
 ```
 
+![image](https://github.com/user-attachments/assets/6a483503-02f0-4683-a33e-e7d715f9f888)
+
 ### Justification for Multiple Group ICA Maps and Masks
 
 The greatest challenge for working with neonatal data is the great variability in brain size and structure happening in just a few

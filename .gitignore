@@ -1,6 +1,7 @@
 img
 img_reoriented
 input
+registered_input
 input-test
 
 rs_data
@@ -21,3 +22,5 @@ mask_preprocessed.nii.gz
 metadata/ica_masks
 
 __pycache__
+
+.temp-registration-processing

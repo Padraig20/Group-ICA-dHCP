@@ -5,7 +5,6 @@ from pathlib import Path
 from register_single_fMRI import main as register_single_fMRI
 from tqdm import tqdm
 import contextlib
-import io
 
 @contextlib.contextmanager # for visual cleanliness
 def suppress_output():

@@ -1,6 +1,5 @@
 import os
 import sys
-import shutil
 from pathlib import Path
 from register_single_fMRI import main as register_single_fMRI
 from tqdm import tqdm
@@ -28,13 +27,6 @@ def process_registration(input_dir, template_file, num_threads):
         print(f"Error: Failed to create output directory: {output_dir}\n{e}")
         sys.exit(1)
 
-    temp_dir = ".temp-registration-processing"
-    try:
-        os.makedirs(temp_dir, exist_ok=True)
-    except OSError as e:
-        print(f"Error: Failed to create temporary working directory: {temp_dir}\n{e}")
-        sys.exit(1)
-
     input_dir_path = Path(input_dir)
     failed_files = []
     files_to_process = list(input_dir_path.glob('*.nii.gz'))
@@ -46,23 +38,14 @@ def process_registration(input_dir, template_file, num_threads):
                 output_file = Path(output_dir) / file.name
 
                 try:
-                    os.chdir(temp_dir)
-
                     with suppress_output(): # simply for visual cleanliness
-                        register_single_fMRI(f"../{str(file)}", f"../{str(output_file)}", f"../{template_file}", num_threads)
+                        register_single_fMRI(str(file), str(output_file), template_file, num_threads)
                     
-                    os.chdir('..')
-
                 except Exception as e:
                     print(f"\nError: Failed to register {file}\n{e}")
                     failed_files.append(file)
-                    os.chdir('..')
-                    shutil.rmtree(temp_dir)
-                    os.makedirs(temp_dir, exist_ok=True)
 
                 pbar.update(1)
-
-    shutil.rmtree(temp_dir)
     
     if failed_files:
         with open('failed_registration.txt', 'w') as f:

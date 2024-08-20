@@ -20,6 +20,7 @@ mask1.nii.gz
 mask_preprocessed.nii.gz
 
 metadata/ica_masks
+metadata/mask_IC.nii.gz
 
 __pycache__
 

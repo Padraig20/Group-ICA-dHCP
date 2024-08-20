@@ -112,14 +112,13 @@ def fit_mask(mask_file_nifti, img):
 
 from argparse import ArgumentParser
 
-parser = ArgumentParser(description='Script used to perform dual regression and connectivity map regression for resting state fMRI. Output can be used as input to SwiFUN. Group ICA file is required to be produced by MELODICA, will be masked on the fly.')
-parser.add_argument('--groupICA_dir', default='registered_input-test', type=str, help='Assume that the group ICA files are registered and flattened (dim: # component * # voxels except backgrounds), will be masked on the fly. Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
+parser = ArgumentParser(description='Script used to perform dual regression and connectivity map regression for resting state fMRI. Output can be used as input to SwiFUN. Group ICA file is required to be produced by MELODICA and masked beforehand.')
+parser.add_argument('--groupICA_dir', default='registered_input', type=str, help='Assume that the group ICA file is registered and flattened (dim: # component * # voxels except backgrounds), needs to be masked beforehand. Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
 parser.add_argument('--outdir', default='out-features', type=str)
 parser.add_argument('--start_idx', default=0, type=int)
-parser.add_argument('--maskdir', default='metadata/ica_masks', type=str,help='Use the masks created by create_masks.py.')
-parser.add_argument('--metadata', default='metadata/ga.tsv', type=str,help='Load the tsv-file containing the subjects\' gestational ages.')
+parser.add_argument('--maskfile', default='metadata/mask_IC.nii.gz', type=str,help='Use the mask created by create_masks.py.')
 parser.add_argument('--rs_data_dir', default='rs_data', type=str, help='Directory containing the resting state data from which the features should be extracted.')
-parser.add_argument('--rs_output_file', default='features_7_comps', type=str,help='Name suffix of the output file for the resting state features')
+parser.add_argument('--rs_output_file', default='features_42_comps', type=str,help='Name suffix of the output file for the resting state features.')
 
 args = parser.parse_args()
 
@@ -138,42 +137,27 @@ outdir = args.outdir
 # set origin directory for raw data
 rs_data_dir = args.rs_data_dir
 
-# load metadata
-print(Style.RESET_ALL + f"Loading metadata from {args.metadata}...")
-md = pd.read_csv(args.metadata, delimiter='\t')
-gestational_ages = pd.DataFrame(md, columns=['ses', 'id', 'ga']) # ses	id	ga
-
-print('Loading masks...')
-masks = dict()
-for ga in range(36, 45):
-    try:
-        mask_file = load_nifti(os.path.join(args.maskdir, f"mask_ga_{ga}.nii.gz"))
-        print(f"Shape of mask {ga}: {mask_file.get_fdata().astype(int).shape}")
-        masks[ga] = mask_file
-    except Exception as e:
-        print(Fore.YELLOW + f'Could not load mask for age {ga}: {e}' + Style.RESET_ALL)
-
-if len(masks) == 0:
-    print(Fore.RED + "No masks were successfully loaded. Exiting..." + Style.RESET_ALL)
+print('Loading mask...')
+try:
+    mask_file = load_nifti(args.maskfile)
+    print(f"Shape of mask: {mask_file.get_fdata().astype(int).shape}")
+    mask = mask_file
+except Exception as e:
+    print(Fore.RED + f'Could not load mask: {e}' + Style.RESET_ALL)
     exit()
-else:   
-    print(Fore.GREEN + 'Successfully loaded masks for the following gestational ages:', masks.keys(), Style.RESET_ALL)
+
+print(Fore.GREEN + f'Successfully loaded mask {args.maskfile}!', Style.RESET_ALL)
 
 print('Loading group ICA...')
-group_icas = dict()
-for ga in range(36, 45):
-    try:
-        group_ica_file = np.load(os.path.join(args.groupICA_dir, f"ga_{ga}" , "output", "melodic_IC_masked.npy"))
-        print(f"Shape of group ICA for gestational age {ga}: {group_ica_file.shape}")
-        group_icas[ga] = group_ica_file
-    except Exception as e:
-        print(Fore.YELLOW + f'Could not load group ICA map for age {ga}: {e}' + Style.RESET_ALL)
-        
-if len(group_icas) == 0:
-    print(Fore.RED + "No group ICA maps were successfully loaded. Exiting..." + Style.RESET_ALL)
+try:
+    group_ica_file = np.load(os.path.join(args.groupICA_dir, "output", "melodic_IC_masked.npy"))
+    print(f"Shape of group ICA map: {group_ica_file.shape}")
+    group_ica = group_ica_file
+except Exception as e:
+    print(Fore.RED + f'Could not load group ICA map: {e}' + Style.RESET_ALL)
     exit()
-else:   
-    print(Fore.GREEN + 'Successfully loaded and masked group ICA maps for the following gestational ages:', group_icas.keys(), Style.RESET_ALL)
+        
+print(Fore.GREEN + 'Successfully loaded and masked group ICA map.', Style.RESET_ALL)
 
 # iterate through all participants and perform feature extraction
 subjects = [ subj for subj in os.listdir(rs_data_dir) ]
@@ -192,10 +176,7 @@ for i, sub in enumerate(sorted(subjects)[args.start_idx:]):
             subject_id = file_name.split('_')[0]
             session_id = int(file_name.split('_')[1].split('-')[1])
             
-            gestational_age = int(gestational_ages.loc[(gestational_ages['id'] == subject_id) & (gestational_ages['ses'] == session_id), 'ga'].values[0])
-            print(f"\tUsing files for gestational age {gestational_age}...")
-            
-            masked_pixels = fit_mask(masks[gestational_age], rs_image)
+            masked_pixels = fit_mask(mask, rs_image)
 
             rs_paths = [masked_pixels]
 
@@ -203,7 +184,6 @@ for i, sub in enumerate(sorted(subjects)[args.start_idx:]):
 
             # perform two steps of feature extraction
             print('\tExtracting features...')
-            group_ica = group_icas[gestational_age]
             dr_comps = dual_regression(data, group_ica)
             features = weighted_seed2voxel(dr_comps, data)
 

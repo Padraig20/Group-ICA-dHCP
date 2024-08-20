@@ -23,23 +23,12 @@ fi
 
 cd "$INPUT_DIR" || exit
 
-for dir in */; do
-    if [ -d "$dir" ]; then
-        echo "Processing directory: $dir"
-        cd "$dir" || exit
+mkdir -p output
+melodic -i all_subjects.nii.gz -o output --nobet -d "$NUM_COMPONENTS" --tr=0.392 --report --verbose --nomask 
 
-        mkdir -p output
-        melodic -i all_subjects.nii.gz -o output --nobet -d "$NUM_COMPONENTS" --tr=0.392 --report --verbose #--nomask 
-
-        # Check if the MELODIC command was successful
-        if [ $? -eq 0 ]; then
-            echo "Successfully ran group ICA."
-        else
-            echo "Error: MELODIC command failed."
-            exit 1
-        fi
-
-        cd ..
-    fi
-done
-
+if [ $? -eq 0 ]; then
+    echo "Successfully ran group ICA."
+else
+    echo "Error: MELODIC command failed."
+    exit 1
+fi

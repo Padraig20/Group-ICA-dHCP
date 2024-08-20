@@ -48,9 +48,9 @@ def fit_mask(mask_file_nifti, img):
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Script used to create masks for ICA components, also to mask the group ICA maps.')
-parser.add_argument('--groupICA_dir', default='registered_input-test', type=str, help='Assume that the group ICA files are registered and flattened (dim: # component * # voxels except backgrounds). Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
-parser.add_argument('--out_maskdir', default='metadata/ica_masks', type=str)
-parser.add_argument('--maskdir', default='metadata/masks', type=str,help='Use the masks you can download from the dHCP website; use the script. It will be preprocessed on the flight for each separate image.')
+parser.add_argument('--groupICA_dir', default='registered_input', type=str, help='Assume that the group ICA files are registered and flattened (dim: # component * # voxels except backgrounds). Assumed to be in directory "output" and called "melodic_IC.nii.gz".')
+parser.add_argument('--out_maskdir', default='metadata', type=str)
+parser.add_argument('--maskfile', default='metadata/mask_ga_40.nii.gz', type=str,help='Use the mask file to create the mask for the group ICA components.')
 
 args = parser.parse_args()
 
@@ -63,24 +63,23 @@ if not os.path.exists(args.out_maskdir):
         print(Fore.RED + "Output directory does not exist and user chose not to create it. Exiting...")
         exit()
         
-for dir in os.listdir(args.groupICA_dir):
-    dir_path = os.path.join(args.groupICA_dir, dir)
-    if os.path.isdir(dir_path):
-        print(f"Processing {dir_path}...")
+dir_path = args.groupICA_dir
 
-        gestational_age = int(dir.split('_')[1]) # ga_XX
-        mask_file = os.path.join(args.maskdir, f'mask_ga_{gestational_age}.nii.gz')
-        mask_file_nifti = load_nifti(mask_file)
-        groupICA_file = os.path.join(dir_path, 'output', 'melodic_IC.nii.gz')
-        groupICA_file_nifti = load_nifti(groupICA_file)
+if os.path.isdir(dir_path):
+    print(f"Loading mask file {args.maskfile}...")
+    mask_file_nifti = load_nifti(args.maskfile)
+    groupICA_file = os.path.join(dir_path, 'output', 'melodic_IC.nii.gz')
+    groupICA_file_nifti = load_nifti(groupICA_file)
         
-        masked_pixels, mask = fit_mask(mask_file_nifti, groupICA_file_nifti)
+    masked_pixels, mask = fit_mask(mask_file_nifti, groupICA_file_nifti)
                         
-        np.save(os.path.join(dir_path, 'output', 'melodic_IC_masked.npy'), masked_pixels)
+    np.save(os.path.join(dir_path, 'output', 'melodic_IC_masked.npy'), masked_pixels)
         
-        output_file = os.path.join(args.out_maskdir, f'mask_ga_{gestational_age}.nii.gz')
-        nb.save(mask, output_file)
+    output_file = os.path.join(args.out_maskdir, f'mask_IC.nii.gz')
+    
+    print(f"Saving mask to {output_file}...")
+    nb.save(mask, output_file)
         
-        print(f"Finished processing {dir_path}.")
-
-print("Finished processing all group ICA directories.")
+    print("Finished creating mask and masking group ICA map.")
+else:
+    print(Fore.RED + f"Error: {dir_path} is not a directory.")

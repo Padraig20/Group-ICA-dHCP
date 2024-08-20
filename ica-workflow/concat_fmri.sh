@@ -12,32 +12,21 @@ if [ ! -d "$DIR" ]; then
     exit 1
 fi
 
-cd "$DIR" || exit
+cd "$DIR" || exit 1
 
-for dir in */; do
-    if [ -d "$dir" ]; then
-        echo "Processing directory: $dir"
+FILES=(*.nii.gz)
 
-        cd "$dir" || exit
+if [ ${#FILES[@]} -eq 0 ]; then
+    echo "Error: No .nii.gz files found in the directory"
+    exit 1
+fi
 
-        FILES=(*.nii.gz)
+fslmerge -t all_subjects.nii.gz "${FILES[@]}"
 
-        if [ ${#FILES[@]} -eq 0 ]; then
-            echo "Error: No .nii.gz files found in the directory"
-            exit 1
-        fi
-
-        fslmerge -t all_subjects.nii.gz "${FILES[@]}"
-
-        if [ $? -eq 0 ]; then
-            echo "Successfully concatenated all .nii.gz files into all_subjects.nii.gz"
-        else
-            echo "Error: fslmerge command failed"
-            exit 1
-        fi
-
-        cd ..
-    fi
-done
-
+if [ $? -eq 0 ]; then
+    echo "Successfully concatenated all .nii.gz files into all_subjects.nii.gz"
+else
+    echo "Error: fslmerge command failed"
+    exit 1
+fi
 

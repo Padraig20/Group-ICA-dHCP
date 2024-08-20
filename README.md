@@ -5,33 +5,25 @@ The goal is to perform grouped Independent Component Analysis (ICA) to extract m
 
 ```
 Group-ICA-dHCP
-├── deprecated                       <- old scripts that are no longer used in the workflow
-│   ├── extract_features_nomask.py   <- extracts features without masking
-│   ├── healthy_subjects_ids.txt     <- 100 healthy subjects, not grouped into gestational ages
-│   └── mask_ICA.py                  <- masks group ICA map via only one mask; masking is now done on the fly
 ├── ica-workflow                     <- contains the whole workflow for generating ICA features
 │   ├── concat_fmri.sh               <- step 1: concatenates normalized fMRI volumes along the temporal axis
-│   ├── create_masks.py              <- step 3: masks the group ICA maps and saves the masks which will be used during SwiFT training and feature extraction
-│   ├── extract_features.py          <- step 4: extracts features via the masked group ICA maps and saved masks from step 3
+│   ├── create_masks.py              <- step 3: masks the group ICA map and saves the mask which will be used during SwiFT training and feature extraction
+│   ├── extract_features.py          <- step 4: extracts features via the masked group ICA map and saved mask from step 3
 │   └── run_group_ica.sh             <- step 2: performs ICA on the concatenated fMRI volumes, outputs group ICA map
 ├── metadata                         <- contains important metadata
-│   ├── ga.tsv                       <- is used to map files to their respective gestational ages
-│   ├── healthy_subjects/            <- contains txt files with ids of healthy subjects used for ICA, grouped in gestational ages
-│   ├── masks/                       <- will contain the downloaded masks
-│   └── t1-templates/                <- will contain the downloaded t1-weighted templates
-├── registration                     <- contains all code necessary to register fMRI images to templates
-│   ├── register_failed_fMRI.sh      <- tries registering all images that did not pass registration in "register_multiple_fMRI.sh"
-│   ├── register_multiple_fMRI.sh    <- registers all images in a directory according to the gestational ages; beware required directory structure
-│   └── register_single_fMRI.sh      <- registers one image to a specified template
-└── setup                            <- all code required to set up the project
-    ├── download_healthy_subjects.py <- download the healthy subjects in the required directory structure from ConnectomeLAB's internal server
-    ├── download_masks.sh            <- downloads all required masks and puts them into ./metadata/masks/
-    └── download_templates.sh        <- downloads all required templates and puts them into ./metadata/t1-templates/
+│   ├── healthy_subjects.txt         <- contains ids of healthy subjects used for ICA
+│   ├── mask_ga_40.nii.gz            <- the brain mask used in step 3 of the pipeline
+│   └── week40_T1w_215mm.nii.gz      <- the extended 40-week T1-weighted template for registration, downsampled to a spatial resolution of 2.15mm isotropic
+└── registration                     <- contains all code necessary to register fMRI images to templates
+    ├── register_multiple_fMRI.py    <- registers all images in a directory (optimized parallelism)
+    ├── register_single_fMRI.py      <- registers one image to a specified template (optimized parallelism)
+    ├── register_multiple_fMRI.sh    <- registers all images in a directory
+    └── register_single_fMRI.sh      <- registers one image to a specified template
 ```
 
 ## Data
 
-There exist 9 different gestational ages in total, from 36 to 44 weeks. Each gestational age needs to be handled separately, and we chose a maximum of 20 random samples of each gestational age. In this sense, we choose normally developing children, i.e. the ones with low risk of developmental delay according to their BSID-III and Q-CHAT scores. There are 725 subjects who have undertaken both Q-CHAT and BSID-III tests. In order to be seen with low risk of developmental delay, children need a BSID-III score higher than 85 regarding the cognitive, language and motor composite scores and a Q-CHAT score between or equal to 19 and 35.
+In the groupwise dHCP volumetric atlas exist 9 different gestational ages in total, from 36 to 44 weeks. We will choose 100 healthy subjects from this range. In this sense, we choose normally developing children, i.e. the ones with low risk of developmental delay according to their BSID-III and Q-CHAT scores. There are 725 subjects who have undertaken both Q-CHAT and BSID-III tests. In order to be seen with low risk of developmental delay, children need a BSID-III score higher than 85 regarding the cognitive, language and motor composite scores and a Q-CHAT score between or equal to 19 and 35.
 
 We only use normally developing children's data since it might be more stable and less noisy (maybe less variability and fewer artifacts) and result in a more reliable set of features. Furthermore, such ICA process might help detecting deviations from the normally developing group.
 
@@ -39,11 +31,7 @@ We only use normally developing children's data since it might be more stable an
 
 ![image](https://github.com/user-attachments/assets/2a69b6fc-5ab5-4a47-8653-b9a30c310ead)
 
-As we can see, there are unfortunately only 8 and 9 subjects available for gestational ages 36 and 37, respectively. In this case, we will use all data available to use for ICA.
-
 The ids of these subjects may be found in **metadata/healthy_subjects/**. Some of these subjects have undergone multiple fMRI sessions - we have chosen to only use one fMRI session per subject for analysis.
-
-For people with access to the ConnectomeLAB internal server, these files may be downloaded via the **download_healthy_subjects.py** script. Please make sure that everything is set up correctly in the ssh config file.
 
 ### Justification for Q-CHAT Threshold
 
@@ -102,8 +90,11 @@ the registration process, we require **GNU parallel 20230822**.
 
 ## fMRI Image Registration
 
-The fMRI images are required to be registered to their respective T1 images, i.e. to the T1-weighted template according to the gestational
-age.
+The fMRI images are required to be registered to the T1-weighted image. In oder to adhere to the spatial resolution of the original images (i.e. ~2.15mm isotropic),
+we decided to downsample the T1-weighted template with an original spatial resolution of .5mm isotropic.
+
+In accordance to the paper **The developing Human Connectome Project (dHCP) automated resting-state functional processing framework for newborn infants**, we have chosen to use the
+extended 40-week T1-weighted template. In accordance, we take the mask of 40 weeks of gestational age from the paper **Unbiased construction of a temporally consistent morphological atlas of neonatal brain development**. 
 
 ## Workflow
 
@@ -114,31 +105,4 @@ age.
 
 This workflow is required for each gestational age.
 
-```
-FOR each gestational_age IN range(36, 45):
-   CONCATENATE fMRI images FROM input_directory FOR current gestational_age INTO output_file
-   GENERATE group ICA map FROM concatenated fMRI file FOR current gestational_age INTO output_directory
-   APPLY brain_mask FOR current gestational_age TO group ICA map FOR current gestational_age INTO masked_output_file
-   FOR each subject fMRI data IN subjects FOR current gestational_age:
-      APPLY brain_mask FOR current gestational_age TO current subject
-      PERFORM dual regression ON group ICA map FOR current gestational_age USING masked subject fMRI data
-      EXTRACT connectivity map FROM masked subject fMRI data FOR current gestational_age INTO feature_output_directory
-```
-
-![image](https://github.com/user-attachments/assets/6a483503-02f0-4683-a33e-e7d715f9f888)
-
-### Justification for Multiple Group ICA Maps and Masks
-
-The greatest challenge for working with neonatal data is the great variability in brain size and structure happening in just a few
-weeks. This is why [the official website](https://gin.g-node.org/BioMedIA/dhcp-volumetric-atlas-groupwise/src/master/mean) offers
-a total of 9 masks for different gestational ages, i.e. between 36 and 44 weeks. Each brain is registered to a template according
-to the gestational age. This becomes evident when looking into the affine matrices of the data.
-
-![image](https://github.com/user-attachments/assets/baae8d81-8ce5-480f-8054-e5c2d196335e)
-
-As seen in the picture, images with the same gestational age have the same affine matrices, while the data with different
-gestational ages have different affine matrices. 
-
-This alone would result in different (and incompatible) dimensionalities for dual regression and connectivity map extraction.
-To address this issue, we need to generate and mask the group ICA maps with the data adhering to the gestational age of
-the analyzed subjects. As a consequence, we will also work with **9 different ICA maps for each gestational age**.
+![image](https://github.com/user-attachments/assets/7f6e2d23-06ac-4835-a19a-8d568e5e4c4a)

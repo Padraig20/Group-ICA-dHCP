@@ -1,3 +1,4 @@
+ants==0.0.7
 antspyx==0.5.3
 colorama==0.4.6
 conntask_ni==0.1.4
@@ -6,9 +7,7 @@ nibabel==5.2.1
 nilearn==0.10.4
 numpy==1.26.4
 pandas==1.5.3
-paramiko==3.4.0
 scikit_learn==1.5.1
 scipy==1.13.1
-scp==0.15.0
 tqdm==4.66.4
 tempdir==0.7.1

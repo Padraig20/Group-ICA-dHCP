@@ -1,6 +1,7 @@
 img
 img_reoriented
 input
+input-test
 
 rs_data
 
@@ -17,24 +18,6 @@ mask.nii.gz
 mask1.nii.gz
 mask_preprocessed.nii.gz
 
-metadata/masks/mask_ga_36.nii.gz
-metadata/masks/mask_ga_37.nii.gz
-metadata/masks/mask_ga_38.nii.gz
-metadata/masks/mask_ga_39.nii.gz
-metadata/masks/mask_ga_40.nii.gz
-metadata/masks/mask_ga_41.nii.gz
-metadata/masks/mask_ga_42.nii.gz
-metadata/masks/mask_ga_43.nii.gz
-metadata/masks/mask_ga_44.nii.gz
-
-metadata/t1-templates/template_t1_ga_36.nii.gz
-metadata/t1-templates/template_t1_ga_37.nii.gz
-metadata/t1-templates/template_t1_ga_38.nii.gz
-metadata/t1-templates/template_t1_ga_39.nii.gz
-metadata/t1-templates/template_t1_ga_40.nii.gz
-metadata/t1-templates/template_t1_ga_41.nii.gz
-metadata/t1-templates/template_t1_ga_42.nii.gz
-metadata/t1-templates/template_t1_ga_43.nii.gz
-metadata/t1-templates/template_t1_ga_44.nii.gz
+metadata/mask_ga_40.nii.gz
 
 metadata/ica_masks

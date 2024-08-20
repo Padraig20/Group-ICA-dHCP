@@ -4,16 +4,16 @@
 
 set -e
 
-for cmd in fslmaths antsRegistrationSyNQuick.sh antsApplyTransforms fslroi fslmerge fslval parallel ResampleImage; do
+for cmd in fslmaths antsRegistrationSyNQuick.sh antsApplyTransforms fslroi fslmerge fslval parallel; do
     if ! command -v $cmd &> /dev/null; then
         echo "Error: $cmd could not be found. Please install it before running this script."
         exit 1
     fi
 done
 
-if [ "$#" -ne 5 ]; then
-    echo "Usage: $0 <input_nifti_file> <output_nifti_file> <template_nifti_file> <num_threads> <target_dim>"
-    echo "Example: $0 input.nii.gz output.nii.gz template_t1.nii.gz 4 68x67x45"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <input_nifti_file> <output_nifti_file> <template_nifti_file> <num_threads>"
+    echo "Example: $0 input.nii.gz output.nii.gz week40_T1w_215mm.nii.gz 4"
     exit 1
 fi
 
@@ -21,7 +21,6 @@ INPUT_FILE="$1"
 OUTPUT_FILE="$2"
 TEMPLATE_FILE="$3"
 NUM_THREADS="$4"
-TARGET_DIM="$5"
 
 echo "Generating a mean 3D image..."
 fslmaths "$INPUT_FILE" -Tmean mean_fMRI_3D.nii.gz
@@ -49,15 +48,12 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-#num_volumes=300
-
 echo "Will register $num_volumes timepoints..."
 
 process_volume() {
     i="$1"
     INPUT_FILE="$2"
     TEMPLATE_FILE="$3"
-	TARGET_DIM="$4"
 
     fslroi "$INPUT_FILE" "registered_timepoints/timepoint_${i}.nii.gz" "$i" 1
     if [ $? -ne 0 ]; then
@@ -73,26 +69,17 @@ process_volume() {
         exit 1
     fi
 
-	ResampleImage 3 "registered_timepoints/timepoint_${i}_registered.nii.gz" \
-		"registered_timepoints/timepoint_${i}_registered_resampled.nii.gz" "$TARGET_DIM" 1
-
-    if [ $? -ne 0 ]; then
-        echo "Error: ResampleImage command failed for timepoint $i."
-        exit 1
-    fi
-
 	rm "registered_timepoints/timepoint_${i}.nii.gz" 
-	rm "registered_timepoints/timepoint_${i}_registered.nii.gz" 
 
     echo "Timepoint $i finished..."
 }
 
 export -f process_volume
 
-parallel -j "$NUM_THREADS" process_volume ::: $(seq 0 2 $(($num_volumes - 1))) ::: "$INPUT_FILE" ::: "$TEMPLATE_FILE" ::: "$TARGET_DIM"
+parallel -j "$NUM_THREADS" process_volume ::: $(seq 0 1 $(($num_volumes - 1))) ::: "$INPUT_FILE" ::: "$TEMPLATE_FILE"
 
 echo "Finished! Now merging files..."
-fslmerge -t "$OUTPUT_FILE" $(ls registered_timepoints/timepoint_*_registered_resampled.nii.gz | sort -V)
+fslmerge -t "$OUTPUT_FILE" $(ls registered_timepoints/timepoint_*_registered.nii.gz | sort -V)
 if [ $? -ne 0 ]; then
     echo "Error: fslmerge command failed."
     exit 1

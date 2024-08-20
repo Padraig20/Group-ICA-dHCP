@@ -21,3 +21,5 @@ mask_preprocessed.nii.gz
 metadata/mask_ga_40.nii.gz
 
 metadata/ica_masks
+
+__pycache__

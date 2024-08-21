@@ -17,7 +17,7 @@ def main(directory):
         sys.exit(1)
 
     try:
-        concatenated_img = concat_imgs(tqdm(files, desc="Concatenating files"),
+        concatenated_img = concat_imgs(tqdm(files, desc="Loading files"),
                                        verbose=1,
                                        dtype=np.float64)
 

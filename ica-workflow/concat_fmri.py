@@ -1,5 +1,6 @@
 import os
 import sys
+import numpy as np
 import nibabel as nib
 from nilearn.image import concat_imgs
 from tqdm import tqdm
@@ -16,7 +17,9 @@ def main(directory):
         sys.exit(1)
 
     try:
-        concatenated_img = concat_imgs(tqdm(files, desc="Concatenating files"))
+        concatenated_img = concat_imgs(tqdm(files, desc="Concatenating files"),
+                                       verbose=1,
+                                       dtype=np.float64)
 
         output_file = os.path.join(directory, 'all_subjects.nii.gz')
         

@@ -20,8 +20,7 @@ def main(input_dir, num_components):
             dim=num_components,
             tr=0.392,
             report=True,
-            verbose=True,
-            nomask=True
+            verbose=True
         )
         print("Successfully ran group ICA.")
     except run.FSLRuntimeError as e:

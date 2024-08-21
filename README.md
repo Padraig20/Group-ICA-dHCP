@@ -5,20 +5,20 @@ The goal is to perform grouped Independent Component Analysis (ICA) to extract m
 
 ```
 Group-ICA-dHCP
-├── ica-workflow                     <- contains the whole workflow for generating ICA features
-│   ├── concat_fmri.sh               <- step 1: concatenates normalized fMRI volumes along the temporal axis
-│   ├── create_masks.py              <- step 3: masks the group ICA map and saves the mask which will be used during SwiFT training and feature extraction
-│   ├── extract_features.py          <- step 4: extracts features via the masked group ICA map and saved mask from step 3
-│   └── run_group_ica.sh             <- step 2: performs ICA on the concatenated fMRI volumes, outputs group ICA map
-├── metadata                         <- contains important metadata
-│   ├── healthy_subjects.txt         <- contains ids of healthy subjects used for ICA
-│   ├── mask_ga_40.nii.gz            <- the brain mask used in step 3 of the pipeline
-│   └── week40_T1w_215mm.nii.gz      <- the extended 40-week T1-weighted template for registration, downsampled to a spatial resolution of 2.15mm isotropic
-└── registration                     <- contains all code necessary to register fMRI images to templates
-    ├── register_multiple_fMRI.py    <- registers all images in a directory (optimized parallelism)
-    ├── register_single_fMRI.py      <- registers one image to a specified template (optimized parallelism)
-    ├── register_multiple_fMRI.sh    <- registers all images in a directory
-    └── register_single_fMRI.sh      <- registers one image to a specified template
+├── ica-workflow                       <- contains the whole workflow for generating ICA features
+│   ├── concat_fmri.sh/.py             <- step 1: concatenates normalized fMRI volumes along the temporal axis
+│   └── run_group_ica.sh/.py           <- step 2: performs ICA on the concatenated fMRI volumes, outputs group ICA map
+│   ├── create_masks.py                <- step 3: masks the group ICA map and saves the mask which will be used during SwiFT training and feature extraction
+│   └── extract_features.py            <- step 4: extracts features via the masked group ICA map and saved mask from step 3
+├── metadata                           <- contains important metadata
+│   ├── healthy_subjects.txt           <- contains ids of healthy subjects used for ICA
+│   ├── mask_ga_40.nii.gz              <- the brain mask used in step 3 of the pipeline
+│   └── week40_T1w_215mm.nii.gz        <- the extended 40-week T1-weighted template for registration, downsampled to a spatial resolution of 2.15mm isotropic
+└── registration                       <- contains all code necessary to register fMRI images to templates
+    ├── register_multiple_fMRI.py      <- registers all images in a directory (optimized parallelism)
+    ├── register_single_fMRI.py        <- registers one image to a specified template (optimized parallelism)
+    ├── register_multiple_fMRI.sh/.py  <- registers all images in a directory, python for optimized parallelism
+    └── register_single_fMRI.sh/.py    <- registers one image to a specified template, python for optimized parallelism
 ```
 
 ## Data

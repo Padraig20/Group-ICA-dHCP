@@ -21,10 +21,10 @@ if [ ! -d "$INPUT_DIR" ]; then
     exit 1
 fi
 
-cd "$INPUT_DIR" || exit
+find $INPUT_DIR -name "*.nii.gz" -type f > "$INPUT_DIR/filelist.txt"
 
 mkdir -p output
-melodic -i all_subjects.nii.gz -o output --nobet -d "$NUM_COMPONENTS" --tr=0.392 --report --verbose --nomask 
+melodic -i filelist.txt -o "$INPUT_DIR/output" --nobet -d "$NUM_COMPONENTS" --tr=0.392 --report --verbose #--nomask 
 
 if [ $? -eq 0 ]; then
     echo "Successfully ran group ICA."

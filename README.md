@@ -6,10 +6,9 @@ The goal is to perform grouped Independent Component Analysis (ICA) to extract m
 ```
 Group-ICA-dHCP
 ├── ica-workflow                       <- contains the whole workflow for generating ICA features
-│   ├── concat_fmri.sh/.py             <- step 1: concatenates normalized fMRI volumes along the temporal axis
-│   └── run_group_ica.sh/.py           <- step 2: performs ICA on the concatenated fMRI volumes, outputs group ICA map
-│   ├── create_masks.py                <- step 3: masks the group ICA map and saves the mask which will be used during SwiFT training and feature extraction
-│   └── extract_features.py            <- step 4: extracts features via the masked group ICA map and saved mask from step 3
+│   └── run_group_ica.sh/.py           <- step 1: performs approximated ICA via MIGP on the fMRI volumes, outputs group ICA map
+│   ├── create_masks.py                <- step 2: masks the group ICA map and saves the mask which will be used during SwiFT training and feature extraction
+│   └── extract_features.py            <- step 3: extracts features via the masked group ICA map and saved mask from step 3
 ├── metadata                           <- contains important metadata
 │   ├── healthy_subjects.txt           <- contains ids of healthy subjects used for ICA
 │   ├── mask_ga_40.nii.gz              <- the brain mask used in step 3 of the pipeline
@@ -98,11 +97,8 @@ extended 40-week T1-weighted template. In accordance, we take the mask of 40 wee
 
 ## Workflow
 
-1. concatenate fMRI images along the temporal axis - **concat_fmri.sh**
-2. generate group ICA map - **run_group_ica.sh**
-3. mask group ICA map and generate masks - **create_masks.py**
-4. dual regression + connectivity map extraction for each subject - **extract_features.py**
+1. generate group ICA map via MIGP - **run_group_ica.sh**
+2. mask group ICA map and generate masks - **create_masks.py**
+3. dual regression + connectivity map extraction for each subject - **extract_features.py**
 
-This workflow is required for each gestational age.
-
-![image](https://github.com/user-attachments/assets/7f6e2d23-06ac-4835-a19a-8d568e5e4c4a)
+![image](https://github.com/user-attachments/assets/d592721e-09dd-4ff9-bae2-32cab2750ea3)

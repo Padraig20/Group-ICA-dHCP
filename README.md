@@ -6,7 +6,7 @@ The goal is to perform grouped Independent Component Analysis (ICA) to extract m
 ```
 Group-ICA-dHCP
 ├── ica-workflow                       <- contains the whole workflow for generating ICA features
-│   └── run_group_ica.sh/.py           <- step 1: performs approximated ICA via MIGP on the fMRI volumes, outputs group ICA map
+│   └── run_group_ica.sh               <- step 1: performs approximated ICA via MIGP on the fMRI volumes, outputs group ICA map
 │   ├── create_masks.py                <- step 2: masks the group ICA map and saves the mask which will be used during SwiFT training and feature extraction
 │   └── extract_features.py            <- step 3: extracts features via the masked group ICA map and saved mask from step 3
 ├── metadata                           <- contains important metadata
